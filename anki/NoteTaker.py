@@ -20,6 +20,7 @@ class NoteTaker:
     def output_deck(self, file_name):
         relative_path = f'anki/output/{file_name}.apkg'
         absolute_path = os.path.abspath(relative_path)
+        Path(absolute_path).mkdir(parents=True, exist_ok=True)
         genanki.Package(self.deck).write_to_file(relative_path)
         return absolute_path
 
