@@ -1,0 +1,5 @@
+.idea
+authorization.py
+logs/log.txt
+anki/output
+translation/parse_dictionaries/apple_german_english.pickle
