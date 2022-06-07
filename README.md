@@ -9,7 +9,7 @@ Further instructions on AnkiConnect homepage
 Temporary design: have set a python script to run periodically via cron. Crontab is:
 ```
 SHELL=/bin/bash
-BASH_ENV=~/.bashrc_conda
+BASH_ENV=~/PycharmProjects/FlashcardMaker/.bashrc_conda
 */5 * * * * conda activate FlashcardMaker; cd ~/PycharmProjects/FlashcardMaker; python main.py
 ```
 
