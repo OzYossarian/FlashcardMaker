@@ -24,4 +24,4 @@ class Phrase:
             data.get('share_date', None),
             data.get('database_date', None),
             data.get('flashcard_date', None),
-            data.get('translation', None))
+            data.get('../translation', None))

@@ -8,8 +8,8 @@ import psutil
 import requests
 
 from FlashcardMaker import FlashcardMaker
-from Phrase import Phrase
-from authorization import tokens
+from server.Phrase import Phrase
+from server.authorization import tokens
 from logs.log import log
 from translation.Translation import Translation
 from utils import RecursiveJsonEncoder
@@ -63,7 +63,8 @@ def post_back_to_database(phrases):
 def add_translations_to_phrases(phrases, translations):
     # TODO - bad design to convert one initial phrase in database into several
     #  records with translations. Better to have two collections in database?
-    #  One for phrases and the other for translations.
+    #  One for phrases and the other for translations. OR just allow phrase
+    #  to have multiple translation documents in database - duh.
     log(f'Adding translations to phrases...')
     now = datetime.now()
     full_phrases = []

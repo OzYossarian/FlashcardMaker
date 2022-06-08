@@ -1,5 +1,9 @@
 .idea
-authorization.py
-logs/log.txt
+# Don't give away security tokens
+server/authorization.py
+# Ignore all log files
+logs/2*
+# Ignore anki deck files used to sync
 anki/output
+# Ignore big pickled dictionary
 translation/parse_dictionaries/apple_german_english.pickle
