@@ -12,6 +12,7 @@ SHELL=/bin/bash
 BASH_ENV=~/PycharmProjects/FlashcardMaker/.bashrc_conda
 */5 * * * * conda activate FlashcardMaker; cd ~/PycharmProjects/FlashcardMaker; python main.py
 ```
+(.bashrc_conda file should be edited so that it points to wherever user's version of (mini)conda is)
 
 Better design: get the MacOS app to execute all the python stuff?
 iOS app certainly won't be able to but that's fine - get iOS app to 
