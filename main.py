@@ -125,7 +125,8 @@ def get_authorization(owner: str):
 def openAnki():
     # Open Anki if it isn't open already.
     running_processes = [process.name() for process in psutil.process_iter()]
-    anki_open = 'AnkiMac' in running_processes
+    # Anki has different name depending on what version, OS, etc.
+    anki_open = 'AnkiMac' in running_processes or 'anki' in running_processes
     if not anki_open:
         log('Opening anki...')
         # Apparently this is best done in a subprocess. But this design is

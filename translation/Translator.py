@@ -16,12 +16,16 @@ from translation.parse_dictionaries.parse_dict import unpickle_dict
 # TODO - in future, check for multiple entries with same english and add
 #  hint? e.g. like how current Anki deck adds (H~) etc.
 from translation.Translation import Translation
+from utils import project_root
 
 
 class Translator:
     def __init__(self):
-        apple_dict_path = 'translation/parse_dictionaries/apple_german_english.pickle'
-        apple_dict_path = os.path.abspath(apple_dict_path)
+        apple_dict_path = \
+            f'{project_root()}/' \
+            f'translation/' \
+            f'parse_dictionaries/' \
+            f'apple_german_english.pickle'
         self.apple_dict = unpickle_dict(apple_dict_path)
 
     def translate(self, phrase: str, new_log_entry=True):
