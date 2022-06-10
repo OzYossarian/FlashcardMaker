@@ -1,13 +1,15 @@
 from typing import Dict, Any, List
 
-from translation.Translation import Translation
+from main.translation.Translation import Translation
 
 
 class Phrase:
     def __init__(
-            self, id: int, german: str, english: str, owner: str,
-            share_date: str, database_date: str, translation_date: str,
-            flashcard_date: str, translations: List[Translation]):
+            self, id: int, german: str, english: str = None,
+            owner: str = None, share_date: str = None,
+            database_date: str = None, translation_date: str = None,
+            flashcard_date: str = None,
+            translations: List[Translation] = None):
         self.id = id
         self.german = german
         self.english = english
@@ -16,7 +18,7 @@ class Phrase:
         self.database_date = database_date
         self.translation_date = translation_date
         self.flashcard_date = flashcard_date
-        self.translations = translations
+        self.translations = translations if translations is not None else []
 
     @classmethod
     def from_data(cls, data: Dict[str, Any]):

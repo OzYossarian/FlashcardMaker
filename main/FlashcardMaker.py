@@ -1,10 +1,10 @@
 import os.path
 from datetime import datetime
 
-from anki.Connector import Connector
-from anki.NoteTaker import NoteTaker
-from logs.log import log
-from translation.Translator import Translator
+from main.anki.Connector import Connector
+from main.anki.NoteTaker import NoteTaker
+from main.logs.log import log
+from main.translation.Translator import Translator
 
 
 class FlashcardMaker:

@@ -1,7 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
-from utils import project_root
+from main.utils import project_root
 
 
 def log(text: str, new_entry=False):

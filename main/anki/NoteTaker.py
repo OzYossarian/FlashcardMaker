@@ -2,8 +2,8 @@ from pathlib import Path
 
 import genanki
 
-from translation.Translation import Translation
-from utils import project_root
+from main.translation.Translation import Translation
+from main.utils import project_root
 
 
 class NoteTaker:

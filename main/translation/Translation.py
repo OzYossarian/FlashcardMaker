@@ -1,7 +1,7 @@
 import unicodedata
 import bs4.element
 
-from logs.log import log
+from main.logs.log import log
 
 
 class Translation:

@@ -1,12 +1,11 @@
-import os
 import urllib.parse
 
 import requests
 
 from typing import List
 from bs4 import BeautifulSoup
-from logs.log import log
-from translation.parse_dictionaries.parse_dict import unpickle_dict
+from main.logs.log import log
+from main.translation.parse_dictionaries.parse_dict import unpickle_dict
 
 
 # Possible word types: adjective, adverb, noun, verb, interjection. More?
@@ -15,8 +14,8 @@ from translation.parse_dictionaries.parse_dict import unpickle_dict
 #  (their?) CSS
 # TODO - in future, check for multiple entries with same english and add
 #  hint? e.g. like how current Anki deck adds (H~) etc.
-from translation.Translation import Translation
-from utils import project_root
+from main.translation.Translation import Translation
+from main.utils import project_root
 
 
 class Translator:

@@ -1,6 +1,6 @@
 import random
-from FlashcardMaker import FlashcardMaker
-from translation.Translation import Translation
+from main.FlashcardMaker import FlashcardMaker
+from main.translation.Translation import Translation
 
 flashcardMaker = FlashcardMaker()
 

@@ -1,6 +1,6 @@
 import requests
 
-from logs.log import log
+from main.logs.log import log
 
 
 class Connector:
