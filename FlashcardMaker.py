@@ -1,3 +1,4 @@
+import os.path
 from datetime import datetime
 
 from anki.Connector import Connector
@@ -25,3 +26,7 @@ class FlashcardMaker:
         deck_apkg = self.note_taker.output_deck(now)
         self.connector.request('importPackage', path=deck_apkg)
         self.connector.request('sync')
+        # Tidy up by deleting the .apkg file immediately
+        if os.path.exists(deck_apkg):
+            os.remove(deck_apkg)
+

@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import genanki
-import os
 
 from translation.Translation import Translation
 from utils import project_root
