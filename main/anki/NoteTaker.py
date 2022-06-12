@@ -1,10 +1,9 @@
 from pathlib import Path
 
 import genanki
-import os
 
-from translation.Translation import Translation
-from utils import project_root
+from main.translation.Translation import Translation
+from main.utils import project_root
 
 
 class NoteTaker:
@@ -19,10 +18,10 @@ class NoteTaker:
         return note
 
     def output_deck(self, file_name):
-        relative_path = f'anki/output/{file_name}.apkg'
+        relative_path = f'main/anki/output/{file_name}.apkg'
         absolute_path = f'{project_root()}/{relative_path}'
         Path(absolute_path).parent.mkdir(parents=True, exist_ok=True)
-        genanki.Package(self.deck).write_to_file(relative_path)
+        genanki.Package(self.deck).write_to_file(absolute_path)
         return absolute_path
 
     @staticmethod

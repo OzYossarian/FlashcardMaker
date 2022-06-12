@@ -1,16 +1,16 @@
 import unicodedata
 import bs4.element
 
-from logs.log import log
+from main.logs.log import log
 
 
 class Translation:
     def __init__(
-            self, german: str, word_type: str = None, context: str = None,
+            self, german: str, category: str = None, context: str = None,
             english: str = None, example: str = None, plural: str = None,
-            conjugation: str = None):
+            conjugation: str = None, article: str = None):
         self.german = german
-        self.type = word_type
+        self.category = category
         self.context = context
         self.english = english
         self.example = example
@@ -19,19 +19,22 @@ class Translation:
         # Applicable only for verbs
         self.conjugation = conjugation
 
-        articles = {
-            'noun, masculine': 'der',
-            'noun, neuter': 'das',
-            'noun, feminine': 'die',
-            'noun, plural': 'die',
-        }
-        self.article = articles.get(word_type, None)
+        if article is None:
+            articles = {
+                'noun, masculine': 'der',
+                'noun, neuter': 'das',
+                'noun, feminine': 'die',
+                'noun, plural': 'die',
+            }
+            self.article = articles.get(category, None)
+        else:
+            self.article = article
 
     def find_plural(self, soup: bs4.BeautifulSoup):
         # Find all nouns with same gender as this phrase.
         matches = [
             x for x in soup.find_all(class_='gramb x_xd0')
-            if x.find(class_='ps').text.startswith(self.type[6:])]
+            if x.find(class_='ps').text.startswith(self.category[6:])]
         plural_starts = [
             match.find('span', text='Pl. ')
             for match in matches
@@ -43,17 +46,17 @@ class Translation:
         ]
         self.plural = '/'.join(plurals) if plurals else '?'
 
-    def __str__(self):
-        return str([
-            self.english,
-            self.article,
-            self.german,
-            self.context,
-            self.type,
-            self.example,
-            self.plural,
-            self.conjugation,
-        ])
+    @classmethod
+    def from_data(cls, data):
+        return cls(
+            data.get('german', None),
+            data.get('category', None),
+            data.get('context', None),
+            data.get('english', None),
+            data.get('example', None),
+            data.get('plural', None),
+            data.get('conjugation', None),
+            data.get('article', None))
 
     @classmethod
     def from_result_tag(cls, result):
@@ -65,7 +68,7 @@ class Translation:
                 .find_all(class_='translation sortablemg featured')[:3]
         translation.english = ', '.join(
             x.find(class_='dictLink').text for x in top_three_translations)
-        if translation.type == 'verb':
+        if translation.category == 'verb':
             translation.english = f'to {translation.english}'
         examples = top_three_translations[0].find(class_='example_lines')
         if examples is not None:
@@ -81,7 +84,7 @@ class Translation:
         if context is not None:
             context = cls.format_contents(context)
         word_type = cls.format_contents(german.find(class_='tag_wordtype'))
-        translation = cls(main, word_type, context, None)
+        translation = cls(main, word_type, context)
         log(f'Extracted German! {translation}')
         return translation
 
@@ -103,3 +106,14 @@ class Translation:
                     log(item.prettify())
                     result.append(cls.format_contents(item))
         return ''.join(unicodedata.normalize("NFKD", x) for x in result)
+
+    def __str__(self):
+        return str([
+            self.english,
+            self.article,
+            self.german,
+            self.context,
+            self.category,
+            self.example,
+            self.plural,
+            self.conjugation])

@@ -1,7 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
-from utils import project_root
+from main.utils import project_root
 
 
 def log(text: str, new_entry=False):
@@ -11,7 +11,7 @@ def log(text: str, new_entry=False):
     else:
         log_text = f'\n{text}'
     date = datetime.now().strftime('%Y_%m_%d')
-    log_path = f'{project_root()}/logs/{date}.txt'
+    log_path = f'{project_root()}/main/logs/{date}.txt'
     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
     with open(log_path, 'a') as log_file:
         log_file.write(log_text)

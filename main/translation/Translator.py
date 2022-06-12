@@ -1,12 +1,12 @@
-import os
+import unicodedata
 import urllib.parse
 
 import requests
 
 from typing import List
 from bs4 import BeautifulSoup
-from logs.log import log
-from translation.parse_dictionaries.parse_dict import unpickle_dict
+from main.logs.log import log
+from main.translation.parse_dictionaries.parse_dict import unpickle_dict
 
 
 # Possible word types: adjective, adverb, noun, verb, interjection. More?
@@ -15,14 +15,15 @@ from translation.parse_dictionaries.parse_dict import unpickle_dict
 #  (their?) CSS
 # TODO - in future, check for multiple entries with same english and add
 #  hint? e.g. like how current Anki deck adds (H~) etc.
-from translation.Translation import Translation
-from utils import project_root
+from main.translation.Translation import Translation
+from main.utils import project_root
 
 
 class Translator:
     def __init__(self):
         apple_dict_path = \
             f'{project_root()}/' \
+            f'main/' \
             f'translation/' \
             f'parse_dictionaries/' \
             f'apple_german_english.pickle'
@@ -39,7 +40,7 @@ class Translator:
             if hits:
                 hits = self.remove_derivatives(hits)
                 hits = self.add_noun_plurals(hits)
-                verbs = [hit for hit in hits if hit.type == 'verb']
+                verbs = [hit for hit in hits if hit.category == 'verb']
                 self.conjugate_verbs(verbs)
                 return hits
             else:
@@ -88,13 +89,13 @@ class Translator:
         found_derivatives = False
 
         def is_likely_derived_adverb(hit: Translation):
-            return hit.type == 'adverb' and any(
-                hit.german == x.german and x.type == 'adjective'
+            return hit.category == 'adverb' and any(
+                hit.german == x.german and x.category == 'adjective'
                 for x in hits)
 
         def is_likely_derived_noun(hit: Translation):
-            return hit.type == 'noun, neuter' and any(
-                hit.german == x.german.capitalize() and x.type == 'verb'
+            return hit.category == 'noun, neuter' and any(
+                hit.german == x.german.capitalize() and x.category == 'verb'
                 for x in hits)
 
         filtered = hits.copy()
@@ -111,11 +112,11 @@ class Translator:
 
     def add_noun_plurals(self, hits: List[Translation]):
         # Remove linguee's plurals - I don't trust them
-        hits = [hit for hit in hits if hit.type != 'noun, plural']
+        hits = [hit for hit in hits if hit.category != 'noun, plural']
 
-        nouns = [hit for hit in hits if hit.type[:4] == 'noun']
+        nouns = [hit for hit in hits if hit.category[:4] == 'noun']
         for noun in nouns:
-            log(f'Pluralising {noun.german} ({noun.type})...')
+            log(f'Pluralising {noun.german} ({noun.category})...')
             if noun.german in self.apple_dict:
                 page = self.apple_dict[noun.german]
                 soup = BeautifulSoup(page, "html.parser")
@@ -131,7 +132,8 @@ class Translator:
     def conjugate_verbs(self, verbs: List[Translation]):
         for verb in verbs:
             log(f'Conjugating verb \'{verb.german}\'...')
-            page = requests.get(self.conjugator_url(verb.german))
+            url = self.conjugator_url(verb.german)
+            page = requests.get(url)
             soup = BeautifulSoup(page.content, "html.parser")
             verb.conjugation = soup.find(id='stammformen').text.strip()
         log('Verbs conjugated!')
@@ -146,5 +148,5 @@ class Translator:
             f'&query={phrase}'
 
     def conjugator_url(self, verb: str):
-        verb = urllib.parse.quote(verb)
+        verb = unicodedata.normalize('NFC', verb)
         return f'https://www.verbformen.de/?w={verb}'
