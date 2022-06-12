@@ -35,6 +35,7 @@ def main():
         german_words = [line.rstrip() for line in file.readlines()]
         log('Creating phrases from lines...')
         phrases = [translate(german) for german in german_words]
+        flashcard_maker.update_anki()
         server.post_phrases(phrases)
 
 

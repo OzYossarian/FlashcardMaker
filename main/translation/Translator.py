@@ -1,3 +1,4 @@
+import unicodedata
 import urllib.parse
 
 import requests
@@ -22,6 +23,7 @@ class Translator:
     def __init__(self):
         apple_dict_path = \
             f'{project_root()}/' \
+            f'main/' \
             f'translation/' \
             f'parse_dictionaries/' \
             f'apple_german_english.pickle'
@@ -130,7 +132,8 @@ class Translator:
     def conjugate_verbs(self, verbs: List[Translation]):
         for verb in verbs:
             log(f'Conjugating verb \'{verb.german}\'...')
-            page = requests.get(self.conjugator_url(verb.german))
+            url = self.conjugator_url(verb.german)
+            page = requests.get(url)
             soup = BeautifulSoup(page.content, "html.parser")
             verb.conjugation = soup.find(id='stammformen').text.strip()
         log('Verbs conjugated!')
@@ -145,5 +148,5 @@ class Translator:
             f'&query={phrase}'
 
     def conjugator_url(self, verb: str):
-        verb = urllib.parse.quote(verb)
+        verb = unicodedata.normalize('NFC', verb)
         return f'https://www.verbformen.de/?w={verb}'

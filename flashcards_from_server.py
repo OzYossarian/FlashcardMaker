@@ -64,4 +64,4 @@ def translate_phrases(flashcard_maker, phrases):
             phrase.flashcard_date = now
 
 
-# main()
+main()
