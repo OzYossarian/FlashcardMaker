@@ -40,22 +40,22 @@ def translate_phrases(flashcard_maker, phrases):
             log(f'Translations exist for {phrase.german} - flashcarding...')
             # Has already been translated, so just needs flashcarding.
             for translation in phrase.translations:
-                flashcard_maker.note_taker.add_note(translation)
+                flashcard_maker.note_taker.add_note(
+                    translation, phrase.deck_name)
             phrase.flashcard_date = now
         else:
             # Needs translating and flashcarding
             if phrase.english == '':
                 log(f'Auto-translating {phrase.german} then flashcarding...')
-                translations, _ = \
-                    flashcard_maker.create(phrase.german, new_log_entry=False)
-                phrase.translations = translations
+                flashcard_maker.create(phrase, new_log_entry=False)
             else:
                 log(f'Translation given: {phrase.german} = {phrase.english}...')
                 translation = Translation(
                     german=phrase.german,
                     english=phrase.english)
                 log(f'Converting given translation to note...')
-                flashcard_maker.note_taker.add_note(translation)
+                flashcard_maker.note_taker.add_note(
+                    translation, phrase.deck_name)
                 phrase.translations = [translation]
             phrase.translation_date = now
             # Mark phrase as flashcarded - even if we didn't actually find any

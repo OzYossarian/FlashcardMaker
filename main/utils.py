@@ -31,3 +31,9 @@ def open_anki():
         # Give it a few seconds to open
         time.sleep(5)
     return already_open
+
+
+def anki_id(object: Any):
+    n = (2 ** 31) - (2 ** 30)
+    id = (hash(object) % n) + (2 ** 30)
+    return id
