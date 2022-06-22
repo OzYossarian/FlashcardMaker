@@ -18,13 +18,14 @@ def main():
         already_open = open_anki()
         log('Anki already open' if already_open else 'Opened Anki...')
         server = Server()
-        phrases = server.get_phrases()
-        if len(phrases) > 0:
-            flashcard_maker = FlashcardMaker()
-            translate_phrases(flashcard_maker, phrases)
-            flashcard_maker.update_anki()
-            server.post_phrases(phrases)
-        log(f'Successfully checked for new flashcards!')
+        for user_name in server.authorizer.users:
+            phrases = server.get_phrases(owner=user_name)
+            if len(phrases) > 0:
+                flashcard_maker = FlashcardMaker(user_name)
+                translate_phrases(flashcard_maker, phrases)
+                flashcard_maker.update_anki()
+                server.post_phrases(phrases)
+            log(f'Successfully checked for new flashcards!')
     except Exception as e:
         log(str(e))
 

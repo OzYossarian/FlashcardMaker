@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 import genanki
@@ -8,6 +9,10 @@ from main.utils import project_root, anki_id
 
 class NoteTaker:
     def __init__(self):
+        # Eventually server will need to log in to several people's Anki
+        # accounts, so an Authorizer will be needed. For now, it isn't.
+        # (Not sure if this comment applies to NoteTaker or Connector!)
+        # (Nor sure if this is even possible! :((( Sad times)
         self.default_deck_name = 'Fluency Lube'
         default_deck_id = anki_id(self.default_deck_name)
         default_deck = genanki.Deck(default_deck_id, self.default_deck_name)
@@ -23,11 +28,13 @@ class NoteTaker:
         deck.add_note(note)
         return note
 
-    def output_deck(self, file_name: str, deck_name: str):
-        relative_path = f'main/anki/output/{file_name}.apkg'
+    def output_deck(self, deck_name: str):
+        now = datetime.now().strftime('%Y%m%d_%H%M%S')
+        deck_file_name = deck_name.replace(' ', '_')
+        relative_path = f'main/anki/output/{now}_{deck_file_name}.apkg'
         absolute_path = f'{project_root()}/{relative_path}'
         Path(absolute_path).parent.mkdir(parents=True, exist_ok=True)
-        deck = self.get_deck(deck_name)
+        deck = self.get_deck(deck_name, create_if_needed=False)
         genanki.Package(deck).write_to_file(absolute_path)
         return absolute_path
 
@@ -74,10 +81,12 @@ class NoteTaker:
                 },
             ])
 
-    def get_deck(self, deck_name: str):
+    def get_deck(self, deck_name: str, create_if_needed: bool = True):
         if deck_name in self.decks:
             return self.decks[deck_name]
-        else:
+        elif create_if_needed:
             deck = genanki.Deck(anki_id(deck_name), deck_name)
             self.decks[deck_name] = deck
             return deck
+        else:
+            return None

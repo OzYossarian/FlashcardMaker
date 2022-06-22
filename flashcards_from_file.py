@@ -11,7 +11,8 @@ from main.utils import open_anki
 def main():
     log('Generating flashcards from file...')
     server = Server()
-    flashcard_maker = FlashcardMaker()
+    user_name = server.authorizer.me
+    flashcard_maker = FlashcardMaker(user_name)
 
     args = configure_args(flashcard_maker.note_taker.default_deck_name)
     log(f'File path is {args.filepath}')
@@ -22,7 +23,8 @@ def main():
 
     def translate(german: str):
         log(f'Translating and flashcarding \'{german}\'...')
-        phrase = Phrase(id=None, german=german, deck_name=args.deck_name)
+        phrase = Phrase(
+            id=None, german=german, owner=user_name, deck_name=args.deck_name)
         flashcard_maker.create(phrase, new_log_entry=False)
         now = datetime.now()
         phrase.share_date = now

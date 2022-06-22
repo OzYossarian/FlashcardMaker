@@ -1,8 +1,8 @@
 .idea
 # Don't give away security tokens
-main/server/authorization.py
+main/authorization/Authorizer.py
 # Ignore all log files
-main/logs/2*
+main/logs/*.txt
 # Ignore anki deck files used to sync
 main/anki/output/*
 # Ignore big pickled dictionary

@@ -1,10 +1,12 @@
 import unicodedata
 import urllib.parse
-
+import deepl
 import requests
 
 from typing import List
 from bs4 import BeautifulSoup
+
+from main.authorization.Authorizer import Authorizer
 from main.logs.log import log
 from main.translation.parse_dictionaries.parse_dict import unpickle_dict
 
@@ -20,7 +22,10 @@ from main.utils import project_root
 
 
 class Translator:
-    def __init__(self):
+    def __init__(self, user_name: str):
+        self.authorizer = Authorizer()
+        deepl_authorization = self.authorizer.deepl_authorization(user_name)
+        self.deepl = deepl.Translator(deepl_authorization)
         apple_dict_path = \
             f'{project_root()}/' \
             f'main/' \
@@ -29,28 +34,31 @@ class Translator:
             f'apple_german_english.pickle'
         self.apple_dict = unpickle_dict(apple_dict_path)
 
-    def translate(self, phrase: str, new_log_entry=True):
+    def translate(self, german: str, new_log_entry=True):
         # The big boi top-level method
         try:
-            log(f'Translating {phrase}...', new_log_entry)
+            log(f'Translating {german}...', new_log_entry)
             # TODO - someone has made a Linguee API - investigate?
             #  If it has pre-downloaded results that it exposes then maybe use
             #  this to stop pinging Linguee too much.
-            hits = self.search_linguee(phrase)
-            if hits:
-                hits = self.remove_derivatives(hits)
-                hits = self.add_noun_plurals(hits)
-                verbs = [hit for hit in hits if hit.category == 'verb']
+            # At first, try to translate with Linguee.
+            translations = self.search_linguee(german)
+            if translations:
+                translations = self.remove_derivatives(translations)
+                translations = self.add_noun_plurals(translations)
+                verbs = [
+                    translation for translation in translations
+                    if translation.category == 'verb']
                 self.conjugate_verbs(verbs)
-                return hits
+                return translations
             else:
-                # TODO Search DeepL for this phrase instead?
-                #  Exciting - they have a free API!
-                return []
+                # Search DeepL for this phrase instead
+                translation = self.deepl_translate(german)
+                return [translation]
         except Exception as e:
             text = \
                 f'The following error occurred ' \
-                f'translating \'{phrase}\': {str(e)}'
+                f'translating \'{german}\': {str(e)}'
             log(text)
             return []
 
@@ -58,7 +66,7 @@ class Translator:
         page = requests.get(self.linguee_url(phrase))
         soup = BeautifulSoup(page.content, "html.parser")
         search_results = soup.find(id='dictionary')
-        hits = []
+        translations = []
         if search_results is None:
             log(f'Linguee has no translation for \'{phrase}\'')
         else:
@@ -69,21 +77,21 @@ class Translator:
                 # Each result is in a class 'lemma', but might also be 'featured'
                 # - what do with non-featured ones?
                 for result in exact_results.find_all(class_='lemma featured'):
-                    hits.append(Translation.from_result_tag(result))
+                    translations.append(Translation.from_result_tag(result))
                 log('Got exact linguee results:')
-                [log(str(hit)) for hit in hits]
+                [log(str(translation)) for translation in translations]
             else:
                 # What to do here?
                 inexact_results = search_results.find(class_='inexact')
                 if inexact_results is not None:
                     log('Only found inexact result(s)')
-                    for result in inexact_results.select('div[class*="lemma featured"]'):
-                        german = result.find(class_='dictLink').text
-                        self.translate(german, new_log_entry=False)
+                    # for result in inexact_results.select('div[class*="lemma featured"]'):
+                    #     german = result.find(class_='dictLink').text
+                    #     translations.extend(self.translate(german, new_log_entry=False))
                 else:
                     log('No results found! See HTML below:')
                     log(search_results.prettify())
-            return hits
+            return translations
 
     def remove_derivatives(self, hits: List[Translation]):
         found_derivatives = False
@@ -137,6 +145,12 @@ class Translator:
             soup = BeautifulSoup(page.content, "html.parser")
             verb.conjugation = soup.find(id='stammformen').text.strip()
         log('Verbs conjugated!')
+
+    def deepl_translate(self, german: str):
+        english = self.deepl.translate_text(
+            german, source_lang='DE', target_lang='EN-GB').text
+        translation = Translation(german, english=english)
+        return translation
 
     def linguee_url(self, phrase: str):
         phrase = urllib.parse.quote(phrase)

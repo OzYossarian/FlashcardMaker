@@ -5,6 +5,10 @@ from main.logs.log import log
 
 class Connector:
     def __init__(self):
+        # Eventually server will need to log in to several people's Anki
+        # accounts, so an Authorizer will be needed. For now, it isn't.
+        # (Not sure if this comment applies to NoteTaker or Connector!)
+        # (Nor sure if this is even possible! :((( Sad times)
         self.version = 4  # Minimum possible - will update in a sec hopefully.
         self.initialised = False
         try:
