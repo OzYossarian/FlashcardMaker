@@ -9,20 +9,21 @@ from main.utils import open_anki
 
 
 def main():
-    log('Generating flashcards from file...')
+    log('Generating flashcards from file...', new_entry=True)
+
+    already_open = open_anki()
+    log('Anki already open...' if already_open else 'Opened Anki...')
+
     server = Server()
     user_name = server.authorizer.me
     flashcard_maker = FlashcardMaker(user_name)
 
     args = configure_args(flashcard_maker.note_taker.default_deck_name)
-    log(f'File path is {args.filepath}')
-    log(f'Deck name is {args.deck_name}')
-
-    already_open = open_anki()
-    log('Anki already open...' if already_open else 'Opened Anki...')
+    log(f'File path is \'{args.filepath}\'...')
+    log(f'Deck name is \'{args.deck_name}\'...')
 
     def translate(german: str):
-        log(f'Translating and flashcarding \'{german}\'...')
+        log(f'\nTranslating and flashcarding \'{german}\'...')
         phrase = Phrase(
             id=None, german=german, owner=user_name, deck_name=args.deck_name)
         flashcard_maker.create(phrase, new_log_entry=False)
@@ -37,6 +38,7 @@ def main():
         german_words = [line.rstrip() for line in file.readlines()]
         log('Creating phrases from lines...')
         phrases = [translate(german) for german in german_words]
+        log('\nPhrases translated and flashcarded!')
         flashcard_maker.update_anki()
         server.post_phrases(phrases)
 
@@ -44,9 +46,10 @@ def main():
 def configure_args(default_deck_name: str):
     description = 'Generate Anki flashcards from a file of German words'
     parser = argparse.ArgumentParser(description=description)
-    filepath_help = 'Relative path to the file containing the German words'
+    filepath_help = 'Relative path to the file containing the German words.'
     parser.add_argument('filepath', help=filepath_help, type=str)
-    deck_name_help = 'Name of the Anki deck to store the flashcards in'
+    deck_name_help = 'Name of the Anki deck to store the flashcards in. '
+    deck_name_help += 'If left blank, defaults to "Fluency Lube".'
     parser.add_argument(
         'deck_name', help=deck_name_help, type=str, nargs='?',
         default=default_deck_name)

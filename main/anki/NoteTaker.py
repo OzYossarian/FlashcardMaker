@@ -51,11 +51,13 @@ class NoteTaker:
             translation.example,
             translation.plural,
             translation.conjugation]
+            # translation.source]
         fields = [
             field if field is not None else ''
             for field in fields]
         return fields
 
+    # TODO - figure out if adding 'source' will break everything!
     @staticmethod
     def default_model(name: str):
         return genanki.Model(
@@ -67,6 +69,7 @@ class NoteTaker:
                 {'name': 'example'},
                 {'name': 'plural'},
                 {'name': 'conjugation'},
+                # {'name': 'source'},
             ],
             templates=[
                 {
@@ -78,6 +81,8 @@ class NoteTaker:
                         '{{example}}<br><br>'
                         '{{plural}}<br><br>'
                         '{{conjugation}}',
+                        # '{{conjugation}}<br><br>'
+                        # '<i>{{source}}</i><br><br>',
                 },
             ])
 
