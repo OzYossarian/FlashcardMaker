@@ -7,13 +7,14 @@ from main.logs.log import log
 class Translation:
     def __init__(
             self, german: str, category: str = None, context: str = None,
-            english: str = None, example: str = None, plural: str = None,
-            conjugation: str = None, article: str = None):
+            english: str = None, example: str = None, source: str = None,
+            plural: str = None, conjugation: str = None, article: str = None):
         self.german = german
         self.category = category
         self.context = context
         self.english = english
         self.example = example
+        self.source = source
         # Applicable only for nouns
         self.plural = plural
         # Applicable only for verbs
@@ -54,18 +55,20 @@ class Translation:
             data.get('context', None),
             data.get('english', None),
             data.get('example', None),
+            data.get('source', None),
             data.get('plural', None),
             data.get('conjugation', None),
             data.get('article', None))
 
     @classmethod
-    def from_result_tag(cls, result):
+    def from_linguee_result_tag(cls, result):
         log('Trying to extract German-English phrase...')
         german_tag = result.find(class_='line lemma_desc')
         translation = cls.extract_german(german_tag)
-        top_three_translations = \
-            result.find(class_='lemma_content') \
-                .find_all(class_='translation sortablemg featured')[:3]
+        top_three_translations = result \
+            .find(class_='lemma_content') \
+            .select('div[class*="translation sortablemg"]')[:3]
+            # .find_all(class_='translation sortablemg featured')[:3]
         translation.english = ', '.join(
             x.find(class_='dictLink').text for x in top_three_translations)
         if translation.category == 'verb':
@@ -77,14 +80,19 @@ class Translation:
         return translation
 
     @classmethod
-    def extract_german(cls, german: bs4.element.Tag):
+    def extract_german(cls, german_tag: bs4.element.Tag):
         log('Trying to extract German...')
-        main = cls.format_contents(german.find(class_='dictLink'))
-        context = german.find(class_='tag_lemma_context')
+        sub_tags = german_tag.find_all(class_='dictLink')
+        german = ' '.join([
+            cls.format_contents(sub_tag) for sub_tag in sub_tags])
+        context = german_tag.find(class_='tag_lemma_context')
         if context is not None:
             context = cls.format_contents(context)
-        word_type = cls.format_contents(german.find(class_='tag_wordtype'))
-        translation = cls(main, word_type, context)
+        category = german_tag.find(class_='tag_wordtype')
+        if category is not None:
+            category = cls.format_contents(category)
+        # Okay for category and/or context to be None.
+        translation = cls(german, category, context)
         log(f'Extracted German! {translation}')
         return translation
 
@@ -116,4 +124,5 @@ class Translation:
             self.category,
             self.example,
             self.plural,
-            self.conjugation])
+            self.conjugation,
+            self.source])

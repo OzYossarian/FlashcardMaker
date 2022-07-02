@@ -6,13 +6,14 @@ from main.translation.Translation import Translation
 class Phrase:
     def __init__(
             self, id: int, german: str, english: str = None,
-            owner: str = None, share_date: str = None,
-            database_date: str = None, translation_date: str = None,
-            flashcard_date: str = None,
+            deck_name: str = None, owner: str = None,
+            share_date: str = None, database_date: str = None,
+            translation_date: str = None, flashcard_date: str = None,
             translations: List[Translation] = None):
         self.id = id
         self.german = german
         self.english = english
+        self.deck_name = deck_name
         self.owner = owner
         self.share_date = share_date
         self.database_date = database_date
@@ -33,6 +34,7 @@ class Phrase:
             data.get('_id', None),
             data.get('german', None),
             data.get('english', None),
+            data.get('deck_name', None),
             data.get('owner', None),
             data.get('share_date', None),
             data.get('database_date', None),
