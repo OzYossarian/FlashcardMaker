@@ -50,8 +50,8 @@ class NoteTaker:
             german,
             translation.example,
             translation.plural,
-            translation.conjugation]
-            # translation.source]
+            translation.conjugation,
+            translation.source]
         fields = [
             field if field is not None else ''
             for field in fields]
@@ -69,7 +69,7 @@ class NoteTaker:
                 {'name': 'example'},
                 {'name': 'plural'},
                 {'name': 'conjugation'},
-                # {'name': 'source'},
+                {'name': 'source'},
             ],
             templates=[
                 {
@@ -80,9 +80,8 @@ class NoteTaker:
                         '{{german}}<br><br>'
                         '{{example}}<br><br>'
                         '{{plural}}<br><br>'
-                        '{{conjugation}}',
-                        # '{{conjugation}}<br><br>'
-                        # '<i>{{source}}</i><br><br>',
+                        '{{conjugation}}<br><br>'
+                        '<i>{{source}}</i><br><br>',
                 },
             ])
 
