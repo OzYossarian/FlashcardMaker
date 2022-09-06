@@ -15,12 +15,15 @@ class FlashcardMaker:
         self.connector = Connector()
 
     def create(self, phrase: Phrase, new_log_entry=True):
-        phrase.translations = \
-            self.translator.translate(phrase.german, new_log_entry)
-        notes = [
-            self.note_taker.add_note(translation, phrase.deck_name)
-            for translation in phrase.translations]
-        return notes
+        translations = self.translator.translate(phrase.german, new_log_entry)
+        if translations is not None:
+            phrase.translations = translations
+            notes = [
+                self.note_taker.add_note(translation, phrase.deck_name)
+                for translation in phrase.translations]
+            return notes
+        else:
+            return None
 
     def update_anki(self):
         log(f'Updating Anki...')

@@ -26,21 +26,26 @@ def main():
         log(f'\nTranslating and flashcarding \'{german}\'...')
         phrase = Phrase(
             id=None, german=german, owner=user_name, deck_name=args.deck_name)
-        flashcard_maker.create(phrase, new_log_entry=False)
-        now = datetime.now()
-        phrase.share_date = now
-        phrase.translation_date = now
-        phrase.flashcard_date = now
-        return phrase
+        notes = flashcard_maker.create(phrase, new_log_entry=False)
+        if notes is not None:
+            now = datetime.now()
+            phrase.share_date = now
+            phrase.translation_date = now
+            phrase.flashcard_date = now
+            return phrase
+        else:
+            # Something went wrong while trying to translate this.
+            return None
 
     with open(args.filepath) as file:
         log('Reading file...')
         german_words = [line.rstrip() for line in file.readlines()]
         log('Creating phrases from lines...')
         phrases = [translate(german) for german in german_words]
+        translated = [phrase for phrase in phrases if phrase is not None]
         log('\nPhrases translated and flashcarded!')
         flashcard_maker.update_anki()
-        server.post_phrases(phrases)
+        server.post_phrases(translated)
 
 
 def configure_args(default_deck_name: str):

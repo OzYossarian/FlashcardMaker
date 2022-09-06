@@ -1,3 +1,4 @@
+import hashlib
 import os
 import time
 from json import JSONEncoder
@@ -33,7 +34,12 @@ def open_anki():
     return already_open
 
 
-def anki_id(object: Any):
-    n = (2 ** 31) - (2 ** 30)
-    id = (hash(object) % n) + (2 ** 30)
+def anki_id(string: str):
+    # Want a hash that persists across all Python sessions - so Python's
+    # built-in 'hash' function won't do. Also want it to be in the range
+    # [2**30, 2**31) as per the genanki GitHub.
+    n = (2 ** 30)
+    string = string.encode(encoding='UTF-8', errors='strict')
+    hashed = int(hashlib.md5(string).hexdigest(), 16)
+    id = (hashed % n) + (2 ** 30)
     return id
