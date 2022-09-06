@@ -60,30 +60,26 @@ class NoteTaker:
     # TODO - figure out if adding 'source' will break everything!
     @staticmethod
     def default_model(name: str):
-        return genanki.Model(
-            anki_id(name),
-            name,
-            fields=[
-                {'name': 'english'},
-                {'name': 'german'},
-                {'name': 'example'},
-                {'name': 'plural'},
-                {'name': 'conjugation'},
-                {'name': 'source'},
-            ],
-            templates=[
-                {
-                    'name': 'Card 1',
-                    'qfmt': '{{english}}',
-                    'afmt':
-                        '{{FrontSide}}<hr id=answer>'
-                        '{{german}}<br><br>'
-                        '{{example}}<br><br>'
-                        '{{plural}}<br><br>'
-                        '{{conjugation}}<br><br>'
-                        '<i>{{source}}</i><br><br>',
-                },
-            ])
+        fields = [
+            {'name': 'english'},
+            {'name': 'german'},
+            {'name': 'example'},
+            {'name': 'plural'},
+            {'name': 'conjugation'},
+            {'name': 'source'}]
+        templates = [{
+            'name': name,
+            'qfmt': '{{english}}',
+            'afmt':
+                '{{FrontSide}}<hr id=answer>'
+                '{{german}}<br><br>'
+                '{{example}}<br><br>'
+                '{{plural}}<br><br>'
+                '{{conjugation}}<br><br>'
+                '<i>{{source}}</i><br><br>'}]
+        css = ".card{text-align: center}"
+        id = anki_id(name + str(fields))
+        return genanki.Model(id, name, fields, templates, css)
 
     def get_deck(self, deck_name: str, create_if_needed: bool = True):
         if deck_name in self.decks:

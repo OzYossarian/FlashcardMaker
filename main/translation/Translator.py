@@ -57,13 +57,13 @@ class Translator:
                     translation = self.deepl_translate(german)
                     return [translation]
             else:
-                return []
+                return None
         except Exception as e:
             text = \
                 f'The following error occurred ' \
                 f'translating \'{german}\': {str(e)}'
             log(text)
-            return []
+            return None
 
     def clean_linguee_translations(self, translations):
         translations = self.remove_derivatives(translations)
@@ -141,7 +141,7 @@ class Translator:
 
         def is_likely_derived_noun(hit: Translation):
             return hit.category == 'noun, neuter' and any(
-                hit.german == x.german.capitalize() and x.category == 'verb'
+                hit.german.lower() in x.german.lower() and x.category == 'verb'
                 for x in hits)
 
         filtered = hits.copy()
