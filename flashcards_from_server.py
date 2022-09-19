@@ -38,8 +38,9 @@ def translate_phrases(flashcard_maker, phrases):
     translated = []
     for phrase in phrases:
         try:
-            translate_phrase(phrase, flashcard_maker)
-            translated.append(phrase)
+            success = translate_phrase(phrase, flashcard_maker)
+            if success:
+                translated.append(phrase)
         except Exception as exception:
             log(
                 f"An error occurred translating {phrase}.\n"
@@ -57,11 +58,15 @@ def translate_phrase(phrase, flashcard_maker):
             flashcard_maker.note_taker.add_note(
                 translation, phrase.deck_name)
         phrase.flashcard_date = now
+        # Always translates successfully.
+        return True
     else:
         # Needs translating and flashcarding
         if phrase.english == '':
             log(f'Auto-translating {phrase.german} then flashcarding...')
-            flashcard_maker.create(phrase, new_log_entry=False)
+            notes = flashcard_maker.create(phrase, new_log_entry=False)
+            # If `notes` is not None, this was successfully translated
+            translated = notes is not None
         else:
             log(f'Translation given: {phrase.german} = {phrase.english}...')
             translation = Translation(
@@ -70,12 +75,17 @@ def translate_phrase(phrase, flashcard_maker):
             log(f'Converting given translation to note...')
             flashcard_maker.note_taker.add_note(
                 translation, phrase.deck_name)
+            translated = True
             phrase.translations = [translation]
-        phrase.translation_date = now
-        # Mark phrase as flashcarded - even if we didn't actually find any
-        # translations. This ensures we don't keep redownloading this
-        # phrase to try to translate it, knowing it won't work.
-        phrase.flashcard_date = now
+        # If we actually did translate this phrase, note this down.
+        # Sometimes we fail - right now this is almost always because we
+        # sent too many Linguee requests in the last few minutes. In this
+        # case, we want to try again with this phrase next time. So don't
+        # mark it as flashcarded.
+        if translated:
+            phrase.translation_date = now
+            phrase.flashcard_date = now
+        return translated
 
 
 main()

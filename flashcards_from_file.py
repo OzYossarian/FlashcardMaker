@@ -39,9 +39,10 @@ def main():
 
     with open(args.filepath) as file:
         log('Reading file...')
-        german_words = [line.rstrip() for line in file.readlines()]
+        german_lines = [line.strip() for line in file.readlines()]
+        german_lines = [line for line in german_lines if line != '']
         log('Creating phrases from lines...')
-        phrases = [translate(german) for german in german_words]
+        phrases = [translate(german) for german in german_lines]
         translated = [phrase for phrase in phrases if phrase is not None]
         log('\nPhrases translated and flashcarded!')
         flashcard_maker.update_anki()
