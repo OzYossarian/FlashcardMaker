@@ -89,26 +89,26 @@ class Translator:
 
     def linguee_translate(self, german: str, response: Response):
         log('Trying to translate with Linguee...')
-        translations = []
         soup = BeautifulSoup(response.content, "html.parser")
         search_results = soup.find(id='dictionary')
-        if search_results is None:
-            log(f'Linguee has no translation for \'{german}\'')
-        else:
-            classes = ['lemma featured']
-            if self.comprehensive:
-                classes.append('lemma')
+        if search_results is not None:
             search_results = search_results.find(class_='isForeignTerm')
-            exact_results = search_results.find(class_='exact')
-            if exact_results is not None:
-                translations = \
-                    self.exact_linguee_translate(exact_results, classes)
-            else:
-                translations = \
-                    self.inexact_linguee_translate(search_results, classes)
-            for translation in translations:
-                translation.source = f'Linguee - \'{german}\''
-        return translations
+            if search_results is not None:
+                classes = ['lemma featured']
+                if self.comprehensive:
+                    classes.append('lemma')
+                exact_results = search_results.find(class_='exact')
+                if exact_results is not None:
+                    translations = \
+                        self.exact_linguee_translate(exact_results, classes)
+                else:
+                    translations = \
+                        self.inexact_linguee_translate(search_results, classes)
+                for translation in translations:
+                    translation.source = f'Linguee - \'{german}\''
+                return translations
+        log(f'Linguee has no translation for \'{german}\'')
+        return []
 
     def inexact_linguee_translate(self, search_results, classes):
         # What to do here?
@@ -183,7 +183,11 @@ class Translator:
             url = self.conjugator_url(verb.german)
             page = requests.get(url)
             soup = BeautifulSoup(page.content, "html.parser")
-            verb.conjugation = soup.find(id='stammformen').text.strip()
+            conjugation = soup.find(id='stammformen')
+            if conjugation is not None:
+                verb.conjugation = conjugation.text.strip()
+            else:
+                log(f"Couldn't conjugate verb '{verb.german}'")
         log('Verbs conjugated!')
 
     def deepl_translate(self, german: str):
