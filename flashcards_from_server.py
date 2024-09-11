@@ -4,7 +4,8 @@ from main.FlashcardMaker import FlashcardMaker
 from main.server.Server import Server
 from main.logs.log import log
 from main.translation.Translation import Translation
-from main.utils import open_anki
+from main.utils import open_anki, close_anki
+
 
 # Temporary design: have a python script that we set the OS to run every x
 # minutes. In this script, get unflashcarded phrases from crunchy nut server,
@@ -26,8 +27,13 @@ def main():
                 flashcard_maker.update_anki()
                 server.post_phrases(translated)
             log(f'Successfully checked for new flashcards!')
+        log('Closing Anki...')
+        close_anki()
     except Exception as e:
         log(str(e))
+        log('Closing Anki...')
+        close_anki()
+
 
 
 def translate_phrases(flashcard_maker, phrases):

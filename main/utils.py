@@ -29,9 +29,30 @@ def open_anki():
         # Apparently this is best done in a subprocess. But this design is
         # temporary so I don't give a fook. Is also Mac specific.
         os.system("open /Applications/Anki.app")
-        # Give it a few seconds to open
-        time.sleep(5)
+        # Give it quite a few seconds to open
+        time.sleep(20)
     return already_open
+
+
+def close_anki():
+    # If Anki is open, close it.
+    processes = [process.name() for process in psutil.process_iter()]
+    # Anki has different names depending on what version, OS, etc.
+    anki_processes = [process for process in processes if 'anki' in process.lower()]
+    is_open = False
+    anki_process = None
+    if len(anki_processes) == 1:
+        is_open = True
+        anki_process = anki_processes.pop()
+    elif len(anki_processes) > 1:
+        raise AssertionError("Multiple Anki instances running!?")
+    if is_open:
+        # Wait a few seconds in case any other processes need finishing.
+        time.sleep(20)
+        # subprocess.Popen("osascript -e 'quit app \"Anki\"'")
+        # os.system("osascript -e 'quit app \"Anki\"'")
+        os.system(f'pkill "{anki_process}"')
+        # exit_response = self.connector.request('guiExitAnki')
 
 
 def anki_id(string: str):
