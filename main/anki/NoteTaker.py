@@ -13,7 +13,7 @@ class NoteTaker:
         # accounts, so an Authorizer will be needed. For now, it isn't.
         # (Not sure if this comment applies to NoteTaker or Connector!)
         # (Nor sure if this is even possible! :((( Sad times)
-        self.default_deck_name = 'Fluency Lube'
+        self.default_deck_name = 'German'
         default_deck_id = anki_id(self.default_deck_name)
         default_deck = genanki.Deck(default_deck_id, self.default_deck_name)
         self.decks = {

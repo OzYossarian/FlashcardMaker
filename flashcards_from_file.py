@@ -55,7 +55,7 @@ def configure_args(default_deck_name: str):
     filepath_help = 'Relative path to the file containing the German words.'
     parser.add_argument('filepath', help=filepath_help, type=str)
     deck_name_help = 'Name of the Anki deck to store the flashcards in. '
-    deck_name_help += 'If left blank, defaults to "Fluency Lube".'
+    deck_name_help += 'If left blank, defaults to "German".'
     parser.add_argument(
         'deck_name', help=deck_name_help, type=str, nargs='?',
         default=default_deck_name)

@@ -30,6 +30,7 @@ class Server:
 
     def post_phrases(self, phrases: Iterable[Phrase]):
         log(f'Posting results back to database...')
+        # TODO - post all results back at once in a single request.
         for phrase in phrases:
             id = phrase.id if phrase.id is not None else ''
             url = self.phrase_url + id
